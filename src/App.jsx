@@ -15,7 +15,7 @@ const App = () => {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        "http://167.172.79.211:8080/api/customers"
+        "https://antd-backend.chickenkiller.com/api/customers"
       );
       setCustomers(response.data.data);
     } catch (error) {

@@ -37,12 +37,12 @@ const MainContent = ({ customers, refreshCustomers }) => {
     try {
       if (isEditing) {
         await axios.put(
-          `http://167.172.79.211:8080/api/customer/${selectedCustomer.customerId}`,
+          `https://antd-backend.chickenkiller.com/api/customer/${selectedCustomer.customerId}`,
           values
         );
         message.success("Customer updated successfully");
       } else {
-        await axios.post(`http://167.172.79.211:8080/api/customer`, values);
+        await axios.post(`https://antd-backend.chickenkiller.com/api/customer`, values);
         message.success("Customer added successfully");
       }
       setTimeout(() => {
@@ -60,7 +60,7 @@ const MainContent = ({ customers, refreshCustomers }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://167.172.79.211:8080/api/customer/${id}`);
+      await axios.delete(`https://antd-backend.chickenkiller.com/api/customer/${id}`);
       message.success("Customer deleted successfully");
       refreshCustomers();
     } catch (error) {
