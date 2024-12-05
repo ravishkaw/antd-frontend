@@ -19,11 +19,10 @@ const App = () => {
     try {
       const response = await getCustomers();
       setCustomers(response.data);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching customers:", error);
+      setIsLoading(false);
     }
   };
 
@@ -37,7 +36,7 @@ const App = () => {
         <Header style={headerStyle}>
           <Navbar />
         </Header>
-        <Content>
+        <Content style={contentStyle}>
           <MainContent
             isLoading={isLoading}
             customers={customers}
@@ -59,6 +58,10 @@ const headerStyle = {
   height: 48,
   lineHeight: "48px",
   backgroundColor: "#4096ff",
+};
+
+const contentStyle = {
+  padding: "2rem",
 };
 const footerStyle = {
   textAlign: "center",
