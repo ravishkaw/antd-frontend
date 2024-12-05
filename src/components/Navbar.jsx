@@ -92,7 +92,9 @@ const AppMenu = ({ isInline = false }) => {
           key: "about",
         },
       ]}
-    >
-    </Menu>
+      style={{
+        backgroundColor: "#4096ff",
+      }}
+    ></Menu>
   );
 };
