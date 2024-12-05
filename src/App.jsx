@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
-
-import "./App.css";
-
-import axios from "axios";
 import { Flex, Layout } from "antd";
+
+import { getCustomers } from "./api";
 
 import Navbar from "./components/Navbar";
 import MainContent from "./components/MainContent";
+import FooterContainer from "./components/Footer";
 
-const { Header, Footer, Sider, Content } = Layout;
+import "./App.css";
+const { Header, Footer, Content } = Layout;
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [customers, setCustomers] = useState([]);
+
   const fetchCustomers = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.get(
-        "https://antd-backend.chickenkiller.com/api/customers"
-      );
-      setCustomers(response.data.data);
+      const response = await getCustomers();
+      setCustomers(response.data);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
@@ -35,11 +39,14 @@ const App = () => {
         </Header>
         <Content>
           <MainContent
+            isLoading={isLoading}
             customers={customers}
             refreshCustomers={fetchCustomers}
           />
         </Content>
-        <Footer style={footerStyle}>Footer</Footer>
+        <Footer style={footerStyle}>
+          <FooterContainer />
+        </Footer>
       </Layout>
     </Flex>
   );
@@ -49,12 +56,13 @@ export default App;
 const headerStyle = {
   textAlign: "center",
   color: "#fff",
-  height: 64,
-  lineHeight: "64px",
+  height: 48,
+  lineHeight: "48px",
   backgroundColor: "#4096ff",
 };
 const footerStyle = {
   textAlign: "center",
   color: "#fff",
+  padding: 0,
   backgroundColor: "#4096ff",
 };
