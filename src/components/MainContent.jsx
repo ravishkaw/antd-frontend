@@ -1,4 +1,13 @@
-import { Button, Table, Space, message, Form, Row, Col } from "antd";
+import {
+  Button,
+  Table,
+  Space,
+  message,
+  Form,
+  Row,
+  Col,
+  Popconfirm,
+} from "antd";
 import { useState } from "react";
 import { addCustomer, editCustomer, deleteCustomer } from "../api";
 
@@ -75,13 +84,21 @@ const MainContent = ({ isLoading, customers, refreshCustomers }) => {
           <Button size="small" onClick={() => openModal(true, record)}>
             Edit
           </Button>
-          <Button
-            danger
-            size="small"
-            onClick={() => handleDelete(record.customerId)}
+          <Popconfirm
+            title="Delete customer"
+            description="Are you sure to delete this customer?"
+            onConfirm={() => handleDelete(record.customerId)}
+            onCancel={() => message.warning("Customer not deleted!")}
+            okButtonProps={{
+              danger: true,
+            }}
+            okText="Yes"
+            cancelText="No"
           >
-            Delete
-          </Button>
+            <Button danger size="small">
+              Delete
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
