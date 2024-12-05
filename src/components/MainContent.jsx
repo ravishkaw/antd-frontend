@@ -1,80 +1,62 @@
-import { Button, Table, Form, Input, Space, message, Modal } from "antd";
-import axios from "axios";
+import { Button, Table, Space, message, Form, Row, Col } from "antd";
 import { useState } from "react";
+import { addCustomer, editCustomer, deleteCustomer } from "../api";
 
-const MainContent = ({ customers, refreshCustomers }) => {
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+import CustomerModal from "./CustomerModal";
+
+const MainContent = ({ isLoading, customers, refreshCustomers }) => {
+  const [modalState, setModalState] = useState({
+    open: false,
+    isEditing: false,
+    confirmLoading: false,
+    selectedCustomer: null,
+  });
+
   const [form] = Form.useForm();
 
-  const showModal = () => {
-    setOpen(true);
+  const openModal = (isEditing, customer = null) => {
+    setModalState({ open: true, isEditing, selectedCustomer: customer });
+    form.setFieldsValue(customer || {});
   };
 
-  const addCustomer = () => {
-    setIsEditing(false);
+  const closeModal = () => {
     form.resetFields();
-    showModal();
-  };
-
-  const handleEdit = (record) => {
-    setIsEditing(true);
-    form.setFieldsValue(record);
-    setSelectedCustomer(record);
-    showModal();
-  };
-
-  const handleCancel = () => {
-    form.resetFields();
-    setIsEditing(false);
-    setOpen(false);
+    setModalState({ ...modalState, open: false });
   };
 
   const handleSave = async (values) => {
-    setConfirmLoading(true);
+    const { isEditing, selectedCustomer } = modalState;
+    setModalState((prev) => ({ ...prev, confirmLoading: true }));
+
     try {
       if (isEditing) {
-        await axios.put(
-          `https://antd-backend.chickenkiller.com/api/customer/${selectedCustomer.customerId}`,
-          values
-        );
+        await editCustomer(selectedCustomer.customerId, values);
         message.success("Customer updated successfully");
       } else {
-        await axios.post(`https://antd-backend.chickenkiller.com/api/customer`, values);
+        await addCustomer(values);
         message.success("Customer added successfully");
       }
-      setTimeout(() => {
-        setConfirmLoading(false);
-        setOpen(false);
-        form.resetFields();
-        refreshCustomers();
-      }, 2000);
-    } catch (error) {
-      console.error("Error saving customer:", error);
+      refreshCustomers();
+      closeModal();
+    } catch {
       message.error("Failed to save customer");
-      setConfirmLoading(false);
+    } finally {
+      setModalState((prev) => ({ ...prev, confirmLoading: false }));
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://antd-backend.chickenkiller.com/api/customer/${id}`);
+      await deleteCustomer(id);
       message.success("Customer deleted successfully");
       refreshCustomers();
-    } catch (error) {
-      console.error("Error deleting customer:", error);
+    } catch {
       message.error("Failed to delete customer");
     }
   };
 
   const columns = [
-    {
-      title: "Id",
-      dataIndex: "customerId",
-      key: "customerId",
-    },
+    { title: "Id", dataIndex: "customerId", key: "customerId" },
     {
       title: "First Name",
       dataIndex: "customerFirstName",
@@ -89,8 +71,8 @@ const MainContent = ({ customers, refreshCustomers }) => {
       title: "Action",
       key: "operation",
       render: (_, record) => (
-        <Space size="small">
-          <Button size="small" onClick={() => handleEdit(record)}>
+        <Space>
+          <Button size="small" onClick={() => openModal(true, record)}>
             Edit
           </Button>
           <Button
@@ -107,41 +89,33 @@ const MainContent = ({ customers, refreshCustomers }) => {
 
   return (
     <>
-      <div style={{ textAlign: "right" }}>
-        <Button type="primary" style={{ margin: "16px" }} onClick={addCustomer}>
-          Add Customer
-        </Button>
-      </div>
-      <Table
-        bordered
-        columns={columns}
-        dataSource={customers}
-        rowKey="customerId"
-      />
-      <Modal
-        title={isEditing ? "Edit Customer" : "Add Customer"}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Form.Item
-            label="First Name"
-            name="customerFirstName"
-            rules={[{ required: true, message: "First name is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Last Name"
-            name="customerLastName"
-            rules={[{ required: true, message: "Last name is required" }]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <Row>
+        <Col span={24}>
+          <Row justify="end">
+            <Button type="primary" onClick={() => openModal(false)}>
+              Add Customer
+            </Button>
+          </Row>
+          <Row justify="center">
+            <Table
+              bordered
+              columns={columns}
+              loading={isLoading}
+              dataSource={customers}
+              rowKey="customerId"
+            />
+
+            <CustomerModal
+              isEditing={modalState.isEditing}
+              open={modalState.open}
+              confirmLoading={modalState.confirmLoading}
+              onCancel={closeModal}
+              onSave={handleSave}
+              form={form}
+            />
+          </Row>
+        </Col>
+      </Row>
     </>
   );
 };
