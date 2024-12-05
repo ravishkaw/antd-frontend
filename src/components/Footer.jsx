@@ -1,16 +1,12 @@
-const Footer = () => {
-  return (
-    <div style={footerStyle}>
-      ©{new Date().getFullYear()} 
-    </div>
-  );
+const FooterContainer = () => {
+  return <div style={footerStyle}>©{new Date().getFullYear()}</div>;
 };
-export default Footer;
+export default FooterContainer;
 
 const footerStyle = {
   textAlign: "center",
   color: "#fff",
-  backgroundColor: "#001529",
-  height: 64,
-  lineHeight: "64px",
+  // backgroundColor: "#001529",
+  height: 48,
+  lineHeight: "48px",
 };
