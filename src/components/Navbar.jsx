@@ -64,7 +64,7 @@ const Navbar = () => {
           width="250px"
           styles={{
             body: {
-              backgroundColor: "#001529",
+              backgroundColor: "#4096ff",
               color: "white",
             },
           }}
